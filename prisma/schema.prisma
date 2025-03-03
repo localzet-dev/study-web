@@ -14,10 +14,31 @@ datasource db {
 }
 
 model users {
-  id                 BigInt   @id @default(autoincrement())
+  id                 BigInt    @id @default(autoincrement())
   name               String
-  email              String
+  email              String    @unique
   password           String
-  reset_token        String
-  reset_token_expiry DateTime
+  reset_token        String?   @unique
+  reset_token_expiry DateTime?
+}
+
+model tasks {
+  id          BigInt   @id @default(autoincrement())
+  id_user     BigInt
+  title       String
+  description String
+  priority    Int
+  status      Boolean
+  created     DateTime
+  completed   DateTime
+  pomodoros   BigInt
+}
+
+model timer {
+  id                  BigInt @id @default(autoincrement())
+  id_user             BigInt
+  id_task             BigInt
+  work_interval       BigInt @default(25)
+  break_interval      BigInt @default(5)
+  pomodoros_completed BigInt
 }
