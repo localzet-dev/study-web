@@ -20,6 +20,8 @@ model users {
   password           String
   reset_token        String?   @unique
   reset_token_expiry DateTime?
+  tasks              tasks[]
+  timer              timer[]
 }
 
 model tasks {
@@ -32,6 +34,9 @@ model tasks {
   created     DateTime
   completed   DateTime
   pomodoros   BigInt
+
+  user  users   @relation(fields: [id_user], references: [id])
+  timer timer[]
 }
 
 model timer {
@@ -41,4 +46,7 @@ model timer {
   work_interval       BigInt @default(25)
   break_interval      BigInt @default(5)
   pomodoros_completed BigInt
+
+  user users @relation(fields: [id_user], references: [id])
+  task tasks @relation(fields: [id_task], references: [id])
 }
