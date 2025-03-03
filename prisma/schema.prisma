@@ -9,6 +9,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model users {
+  id                 BigInt   @id @default(autoincrement())
+  name               String
+  email              String
+  password           String
+  reset_token        String
+  reset_token_expiry DateTime
 }
