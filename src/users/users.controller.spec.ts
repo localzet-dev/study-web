@@ -51,7 +51,7 @@ describe('UsersController', () => {
       role: 'user',
     });
 
-    const user = await controller.findOne(1, { userId: 1 });
+    const user = await controller.findOne('1', { userId: 1 });
     expect(user).toEqual({ id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'user' });
   });
 
@@ -80,12 +80,12 @@ describe('UsersController', () => {
   });
 
   it('should update a user', async () => {
-    const result = await controller.update(1, { name: 'Updated User' });
+    const result = await controller.update('1', { name: 'Updated User' });
     expect(result.message).toBe('Пользователь успешно обновлён.');
   });
 
   it('should delete a user', async () => {
-    const result = await controller.remove(1);
+    const result = await controller.remove('1');
     expect(result.message).toBe('Пользователь успешно удалён.');
   });
 });
