@@ -1,33 +1,94 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import {PrismaService} from '../prisma/prisma.service';
-import {hash} from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-    constructor(private prisma: PrismaService) {
+    constructor(private readonly prisma: PrismaService) {
     }
 
     async findAll() {
         return this.prisma.users.findMany({
-            include: {tasks: true, timer: true},
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
         });
     }
 
     async findOne(id: number) {
-        return this.prisma.users.findUnique({
+        const user = await this.prisma.users.findUnique({
             where: {id},
-            include: {tasks: true, timer: true},
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
+        });
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+        return user;
+    }
+
+    async create(data: { name: string; email: string; password: string; role: string }) {
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+
+        return this.prisma.users.create({
+            data: {
+                name: data.name,
+                email: data.email,
+                password: hashedPassword,
+                role: data.role || 'user',
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
         });
     }
 
-    async update(id: number, data: Partial<{ name: string; email: string; password: string }>) {
-        if (data.password) {
-            data.password = await hash(data.password, 10);
+    async update(id: number, data: Partial<{ name: string; email: string; password: string; role: string }>) {
+        const user = await this.prisma.users.findUnique({where: {id}});
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
         }
-        return this.prisma.users.update({where: {id}, data});
+
+        if (data.password) {
+            data.password = await bcrypt.hash(data.password, 10);
+        }
+
+        return this.prisma.users.update({
+            where: {id},
+            data,
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
+        });
     }
 
     async remove(id: number) {
-        return this.prisma.users.delete({where: {id}});
+        const user = await this.prisma.users.findUnique({where: {id}});
+        if (!user) {
+            throw new NotFoundException(`User with ID ${id} not found`);
+        }
+
+        return this.prisma.users.delete({
+            where: {id},
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
+        });
     }
 }

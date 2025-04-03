@@ -18,6 +18,7 @@ model users {
   name               String
   email              String    @unique
   password           String
+  role               String    @default("user") // Роль: "user" или "admin"
   reset_token        String?   @unique
   reset_token_expiry DateTime?
   tasks              tasks[]
