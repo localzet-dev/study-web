@@ -18,8 +18,8 @@ export class UsersController {
 
   @Roles('admin', 'user')
   @Get(':id')
-  async findOne(@Param('id') id: number, @Body() body: { userId: number }) {
-    const user = await this.usersService.findOne(id);
+  async findOne(@Param('id') id: string, @Body() body: { userId: number }) {
+    const user = await this.usersService.findOne(parseInt(id));
 
     if (user.id !== body.userId && user.role !== 'admin') {
       throw new ForbiddenException(UserMessages.FORBIDDEN_ACCESS);
@@ -37,15 +37,15 @@ export class UsersController {
 
   @Roles('admin')
   @Put(':id')
-  async update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
-    const user = await this.usersService.update(id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    const user = await this.usersService.update(parseInt(id), updateUserDto);
     return { message: UserMessages.UPDATED_SUCCESS, user };
   }
 
   @Roles('admin')
   @Delete(':id')
-  async remove(@Param('id') id: number) {
-    await this.usersService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.usersService.remove(parseInt(id));
     return { message: UserMessages.DELETED_SUCCESS };
   }
 }
