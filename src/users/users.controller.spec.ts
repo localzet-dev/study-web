@@ -13,37 +13,11 @@ describe('UsersController', () => {
         {
           provide: UsersService,
           useValue: {
-            findAll: jest.fn().mockResolvedValue([]),
-            findOne: jest.fn().mockResolvedValue({
-              id: 1n,
-              name: 'Test User',
-              email: 'test@example.com',
-              password: 'hashedPassword',
-              reset_token: null,
-              reset_token_expiry: null,
-              tasks: jest.fn().mockReturnValue(Promise.resolve([])),
-              timer: jest.fn().mockReturnValue(Promise.resolve([])),
-            }),
-            update: jest.fn().mockResolvedValue({
-              id: 1n,
-              name: 'Updated User',
-              email: 'updated@example.com',
-              password: 'hashedPassword',
-              reset_token: null,
-              reset_token_expiry: null,
-              tasks: jest.fn().mockReturnValue(Promise.resolve([])),
-              timer: jest.fn().mockReturnValue(Promise.resolve([])),
-            }),
-            remove: jest.fn().mockResolvedValue({
-              id: 1n,
-              name: 'Deleted User',
-              email: 'deleted@example.com',
-              password: 'hashedPassword',
-              reset_token: null,
-              reset_token_expiry: null,
-              tasks: jest.fn().mockReturnValue(Promise.resolve([])),
-              timer: jest.fn().mockReturnValue(Promise.resolve([])),
-            }),
+            findAll: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
           },
         },
       ],
@@ -54,23 +28,87 @@ describe('UsersController', () => {
   });
 
   it('should return all users', async () => {
+    jest.spyOn(service, 'findAll').mockResolvedValue([]);
+
     const users = await controller.findAll();
+
     expect(users).toEqual([]);
   });
 
   it('should return one user by ID', async () => {
-    const user = await controller.findOne('1');
-    expect(user).not.toBeNull();
-    expect(user!.email).toBe('test@example.com');
+    jest.spyOn(service, 'findOne').mockResolvedValue({
+      id: 1n,
+      name: 'Test User',
+      email: 'test@example.com',
+      role: 'user',
+    });
+
+    const user = await controller.findOne('1', { userId: 1 });
+
+    expect(user).toEqual({
+      id: 1n,
+      name: 'Test User',
+      email: 'test@example.com',
+      role: 'user',
+    });
   });
 
-  it('should update user data', async () => {
+  it('should create a user', async () => {
+    jest.spyOn(service, 'create').mockResolvedValue({
+      id: 1n,
+      name: 'New User',
+      email: 'newuser@example.com',
+      role: 'user',
+    });
+
+    const newUser = await controller.create({
+      name: 'New User',
+      email: 'newuser@example.com',
+      password: 'password',
+      role: 'user',
+    });
+
+    expect(newUser).toEqual({
+      id: 1n,
+      name: 'New User',
+      email: 'newuser@example.com',
+      role: 'user',
+    });
+  });
+
+  it('should update a user', async () => {
+    jest.spyOn(service, 'update').mockResolvedValue({
+      id: 1n,
+      name: 'Updated User',
+      email: 'updated@example.com',
+      role: 'user',
+    });
+
     const updatedUser = await controller.update('1', { name: 'Updated User' });
-    expect(updatedUser.name).toBe('Updated User');
+
+    expect(updatedUser).toEqual({
+      id: 1n,
+      name: 'Updated User',
+      email: 'updated@example.com',
+      role: 'user',
+    });
   });
 
-  it('should remove user by ID', async () => {
+  it('should remove a user by ID', async () => {
+    jest.spyOn(service, 'remove').mockResolvedValue({
+      id: 1n,
+      name: 'Deleted User',
+      email: 'deleted@example.com',
+      role: 'user',
+    });
+
     const removedUser = await controller.remove('1');
-    expect(removedUser.name).toBe('Deleted User');
+
+    expect(removedUser).toEqual({
+      id: 1n,
+      name: 'Deleted User',
+      email: 'deleted@example.com',
+      role: 'user',
+    });
   });
 });

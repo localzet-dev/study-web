@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { JwtService } from '@nestjs/jwt';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -12,16 +10,11 @@ describe('AuthController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
-        AuthService,
-        JwtService,
         {
-          provide: PrismaService,
+          provide: AuthService,
           useValue: {
-            // Моки методов Prisma (например, findUnique, create, ...)
-            users: {
-              findUnique: jest.fn(),
-              create: jest.fn(),
-            },
+            register: jest.fn(),
+            login: jest.fn(),
           },
         },
       ],
@@ -32,25 +25,25 @@ describe('AuthController', () => {
   });
 
   it('should register a user', async () => {
-    jest.spyOn(service, 'register').mockResolvedValue('jwtToken');
+    jest.spyOn(service, 'register').mockResolvedValue({ token: 'jwtToken' });
 
-    const token = await controller.register({
+    const result = await controller.register({
       name: 'Test User',
       email: 'test@example.com',
       password: 'password',
     });
 
-    expect(token).toBe('jwtToken');
+    expect(result).toEqual({ token: 'jwtToken' });
   });
 
   it('should login a user', async () => {
-    jest.spyOn(service, 'login').mockResolvedValue('jwtToken');
+    jest.spyOn(service, 'login').mockResolvedValue({ token: 'jwtToken' });
 
-    const token = await controller.login({
+    const result = await controller.login({
       email: 'test@example.com',
       password: 'password',
     });
 
-    expect(token).toBe('jwtToken');
+    expect(result).toEqual({ token: 'jwtToken' });
   });
 });

@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
 
 describe('UsersService', () => {
   let service: UsersService;
@@ -16,36 +15,10 @@ describe('UsersService', () => {
           useValue: {
             users: {
               findMany: jest.fn().mockResolvedValue([]),
-              findUnique: jest.fn().mockResolvedValue({
-                id: 1n,
-                name: 'Test User',
-                email: 'test@example.com',
-                password: 'hashedPassword',
-                reset_token: null,
-                reset_token_expiry: null,
-                tasks: jest.fn().mockReturnValue(Promise.resolve([])),
-                timer: jest.fn().mockReturnValue(Promise.resolve([])),
-              }),
-              update: jest.fn().mockResolvedValue({
-                id: 1n,
-                name: 'Updated User',
-                email: 'updated@example.com',
-                password: 'hashedPassword',
-                reset_token: null,
-                reset_token_expiry: null,
-                tasks: jest.fn().mockReturnValue(Promise.resolve([])),
-                timer: jest.fn().mockReturnValue(Promise.resolve([])),
-              }),
-              delete: jest.fn().mockResolvedValue({
-                id: 1n,
-                name: 'Deleted User',
-                email: 'deleted@example.com',
-                password: 'hashedPassword',
-                reset_token: null,
-                reset_token_expiry: null,
-                tasks: jest.fn().mockReturnValue(Promise.resolve([])),
-                timer: jest.fn().mockReturnValue(Promise.resolve([])),
-              }),
+              findUnique: jest.fn(),
+              create: jest.fn(),
+              update: jest.fn(),
+              delete: jest.fn(),
             },
           },
         },
@@ -62,17 +35,61 @@ describe('UsersService', () => {
   });
 
   it('should return one user by ID', async () => {
+    jest.spyOn(prisma.users, 'findUnique').mockResolvedValue({
+      id: 1n,
+      name: 'Test User',
+      email: 'test@example.com',
+      role: 'user',
+    });
+
     const user = await service.findOne(1);
     expect(user).not.toBeNull();
     expect(user!.email).toBe('test@example.com');
   });
 
-  it('should update user data', async () => {
+  it('should create a user', async () => {
+    jest.spyOn(prisma.users, 'create').mockResolvedValue({
+      id: 1n,
+      name: 'New User',
+      email: 'newuser@example.com',
+      role: 'user',
+    });
+
+    const newUser = await service.create({
+      name: 'New User',
+      email: 'newuser@example.com',
+      password: 'password',
+      role: 'user',
+    });
+
+    expect(newUser).toEqual({
+      id: 1n,
+      name: 'New User',
+      email: 'newuser@example.com',
+      role: 'user',
+    });
+  });
+
+  it('should update a user', async () => {
+    jest.spyOn(prisma.users, 'update').mockResolvedValue({
+      id: 1n,
+      name: 'Updated User',
+      email: 'updated@example.com',
+      role: 'user',
+    });
+
     const updatedUser = await service.update(1, { name: 'Updated User' });
     expect(updatedUser.name).toBe('Updated User');
   });
 
-  it('should remove user by ID', async () => {
+  it('should remove a user by ID', async () => {
+    jest.spyOn(prisma.users, 'delete').mockResolvedValue({
+      id: 1n,
+      name: 'Deleted User',
+      email: 'deleted@example.com',
+      role: 'user',
+    });
+
     const removedUser = await service.remove(1);
     expect(removedUser.name).toBe('Deleted User');
   });

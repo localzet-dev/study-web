@@ -27,18 +27,18 @@ describe('AuthService', () => {
   });
 
   it('should register a user', async () => {
-    jest.spyOn(service, 'register').mockResolvedValue('jwtToken');
+    jest.spyOn(service, 'register').mockResolvedValue({ token: 'jwtToken' });
 
     const token = await service.register('Test User', 'test@example.com', 'password');
 
-    expect(token).toBe('jwtToken');
+    expect(token).toEqual({ token: 'jwtToken' });
   });
 
   it('should login a user', async () => {
-    jest.spyOn(service, 'login').mockResolvedValue('jwtToken');
+    jest.spyOn(service, 'login').mockResolvedValue({ token: 'jwtToken' });
 
     const token = await service.login('test@example.com', 'password');
 
-    expect(token).toBe('jwtToken');
+    expect(token).toEqual({ token: 'jwtToken' });
   });
 });
