@@ -48,8 +48,5 @@ jobs:
     needs: build-docker
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
       - name: Pull Latest Image
         run: docker pull ghcr.io/${{ github.repository }}:latest
