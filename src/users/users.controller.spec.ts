@@ -63,7 +63,7 @@ describe('UsersController', () => {
       role: 'user',
     });
 
-    await expect(controller.findOne(1, { userId: 2 })).rejects.toThrow(ForbiddenException);
+    await expect(controller.findOne('1', { userId: 2 })).rejects.toThrow(ForbiddenException);
   });
 
   it('should create a user', async () => {
