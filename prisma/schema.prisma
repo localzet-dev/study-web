@@ -14,7 +14,7 @@ datasource db {
 }
 
 model users {
-  id                 BigInt    @id @default(autoincrement())
+  id                 Int       @id @default(autoincrement())
   name               String
   email              String    @unique
   password           String
@@ -25,27 +25,27 @@ model users {
 }
 
 model tasks {
-  id          BigInt   @id @default(autoincrement())
-  id_user     BigInt
+  id          Int      @id @default(autoincrement())
+  id_user     Int
   title       String
   description String
   priority    Int
   status      Boolean
   created     DateTime
   completed   DateTime
-  pomodoros   BigInt
+  pomodoros   Int
 
   user  users   @relation(fields: [id_user], references: [id])
   timer timer[]
 }
 
 model timer {
-  id                  BigInt @id @default(autoincrement())
-  id_user             BigInt
-  id_task             BigInt
-  work_interval       BigInt @default(25)
-  break_interval      BigInt @default(5)
-  pomodoros_completed BigInt
+  id                  Int @id @default(autoincrement())
+  id_user             Int
+  id_task             Int
+  work_interval       Int @default(25)
+  break_interval      Int @default(5)
+  pomodoros_completed Int
 
   user users @relation(fields: [id_user], references: [id])
   task tasks @relation(fields: [id_task], references: [id])
