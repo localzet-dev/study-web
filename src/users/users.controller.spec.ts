@@ -37,7 +37,7 @@ describe('UsersController', () => {
 
   it('should return one user by ID', async () => {
     jest.spyOn(service, 'findOne').mockResolvedValue({
-      id: 1n,
+      id: 1,
       name: 'Test User',
       email: 'test@example.com',
       role: 'user',
@@ -46,7 +46,7 @@ describe('UsersController', () => {
     const user = await controller.findOne('1', { userId: 1 });
 
     expect(user).toEqual({
-      id: 1n,
+      id: 1,
       name: 'Test User',
       email: 'test@example.com',
       role: 'user',
@@ -55,7 +55,7 @@ describe('UsersController', () => {
 
   it('should create a user', async () => {
     jest.spyOn(service, 'create').mockResolvedValue({
-      id: 1n,
+      id: 1,
       name: 'New User',
       email: 'newuser@example.com',
       role: 'user',
@@ -69,7 +69,7 @@ describe('UsersController', () => {
     });
 
     expect(newUser).toEqual({
-      id: 1n,
+      id: 1,
       name: 'New User',
       email: 'newuser@example.com',
       role: 'user',
@@ -78,7 +78,7 @@ describe('UsersController', () => {
 
   it('should update a user', async () => {
     jest.spyOn(service, 'update').mockResolvedValue({
-      id: 1n,
+      id: 1,
       name: 'Updated User',
       email: 'updated@example.com',
       role: 'user',
@@ -87,7 +87,7 @@ describe('UsersController', () => {
     const updatedUser = await controller.update('1', { name: 'Updated User' });
 
     expect(updatedUser).toEqual({
-      id: 1n,
+      id: 1,
       name: 'Updated User',
       email: 'updated@example.com',
       role: 'user',
@@ -96,7 +96,7 @@ describe('UsersController', () => {
 
   it('should remove a user by ID', async () => {
     jest.spyOn(service, 'remove').mockResolvedValue({
-      id: 1n,
+      id: 1,
       name: 'Deleted User',
       email: 'deleted@example.com',
       role: 'user',
@@ -105,7 +105,7 @@ describe('UsersController', () => {
     const removedUser = await controller.remove('1');
 
     expect(removedUser).toEqual({
-      id: 1n,
+      id: 1,
       name: 'Deleted User',
       email: 'deleted@example.com',
       role: 'user',
