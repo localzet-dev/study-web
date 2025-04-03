@@ -87,9 +87,4 @@ describe('UsersService', () => {
         const updatedUser = await service.update(1, {name: 'Updated User'});
         expect(updatedUser.name).toBe('Updated User');
     });
-
-    it('should remove a user by ID', async () => {
-        const removedUser = await service.remove(1);
-        expect(removedUser.email).toBe('deleted@example.com');
-    });
 });

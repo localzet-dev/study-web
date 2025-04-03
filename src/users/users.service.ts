@@ -1,6 +1,6 @@
 import {Injectable, NotFoundException} from '@nestjs/common';
 import {PrismaService} from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import {CreateUserDto, UpdateUserDto, UserMessages} from './users.dto';
 
 @Injectable()
 export class UsersService {
@@ -29,66 +29,43 @@ export class UsersService {
             },
         });
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(UserMessages.NOT_FOUND(id));
         }
         return user;
     }
 
-    async create(data: { name: string; email: string; password: string; role: string }) {
-        const hashedPassword = await bcrypt.hash(data.password, 10);
-
-        return this.prisma.users.create({
+    async create(data: CreateUserDto) {
+        const user = await this.prisma.users.create({
             data: {
                 name: data.name,
                 email: data.email,
-                password: hashedPassword,
+                password: data.password,
                 role: data.role || 'user',
             },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-            },
         });
+        return user;
     }
 
-    async update(id: number, data: Partial<{ name: string; email: string; password: string; role: string }>) {
+    async update(id: number, data: UpdateUserDto) {
         const user = await this.prisma.users.findUnique({where: {id}});
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(UserMessages.NOT_FOUND(id));
         }
 
-        if (data.password) {
-            data.password = await bcrypt.hash(data.password, 10);
-        }
-
-        return this.prisma.users.update({
+        const updatedUser = await this.prisma.users.update({
             where: {id},
             data,
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-            },
         });
+        return updatedUser;
     }
 
     async remove(id: number) {
         const user = await this.prisma.users.findUnique({where: {id}});
         if (!user) {
-            throw new NotFoundException(`User with ID ${id} not found`);
+            throw new NotFoundException(UserMessages.NOT_FOUND(id));
         }
 
-        return this.prisma.users.delete({
-            where: {id},
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-            },
-        });
+        await this.prisma.users.delete({where: {id}});
+        return {id, message: UserMessages.DELETED_SUCCESS};
     }
 }

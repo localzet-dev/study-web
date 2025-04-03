@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { NotFoundException, ForbiddenException } from '@nestjs/common';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -13,11 +14,21 @@ describe('UsersController', () => {
         {
           provide: UsersService,
           useValue: {
-            findAll: jest.fn(),
+            findAll: jest.fn().mockResolvedValue([]),
             findOne: jest.fn(),
-            create: jest.fn(),
-            update: jest.fn(),
-            remove: jest.fn(),
+            create: jest.fn().mockResolvedValue({
+              id: 1,
+              name: 'John Doe',
+              email: 'john.doe@example.com',
+              role: 'user',
+            }),
+            update: jest.fn().mockResolvedValue({
+              id: 1,
+              name: 'Updated User',
+              email: 'updated@example.com',
+              role: 'admin',
+            }),
+            remove: jest.fn().mockResolvedValue(null),
           },
         },
       ],
@@ -27,88 +38,54 @@ describe('UsersController', () => {
     service = module.get<UsersService>(UsersService);
   });
 
-  it('should return all users', async () => {
-    jest.spyOn(service, 'findAll').mockResolvedValue([]);
-
+  it('should allow admin to find all users', async () => {
     const users = await controller.findAll();
-
     expect(users).toEqual([]);
   });
 
-  it('should return one user by ID', async () => {
+  it('should find one user by ID', async () => {
     jest.spyOn(service, 'findOne').mockResolvedValue({
       id: 1,
-      name: 'Test User',
-      email: 'test@example.com',
+      name: 'John Doe',
+      email: 'john.doe@example.com',
       role: 'user',
     });
 
-    const user = await controller.findOne('1', { userId: 1 });
+    const user = await controller.findOne(1, { userId: 1 });
+    expect(user).toEqual({ id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'user' });
+  });
 
-    expect(user).toEqual({
+  it('should throw ForbiddenException for unauthorized access', async () => {
+    jest.spyOn(service, 'findOne').mockResolvedValue({
       id: 1,
-      name: 'Test User',
-      email: 'test@example.com',
+      name: 'John Doe',
+      email: 'john.doe@example.com',
       role: 'user',
     });
+
+    await expect(controller.findOne(1, { userId: 2 })).rejects.toThrow(ForbiddenException);
   });
 
   it('should create a user', async () => {
-    jest.spyOn(service, 'create').mockResolvedValue({
-      id: 1,
-      name: 'New User',
-      email: 'newuser@example.com',
-      role: 'user',
-    });
-
-    const newUser = await controller.create({
+    const result = await controller.create({
       name: 'New User',
       email: 'newuser@example.com',
       password: 'password',
-      role: 'user',
+      role: 'admin',
     });
-
-    expect(newUser).toEqual({
-      id: 1,
-      name: 'New User',
-      email: 'newuser@example.com',
-      role: 'user',
+    expect(result).toEqual({
+      message: 'Пользователь успешно создан.',
+      user: { id: 1, name: 'John Doe', email: 'john.doe@example.com', role: 'user' },
     });
   });
 
   it('should update a user', async () => {
-    jest.spyOn(service, 'update').mockResolvedValue({
-      id: 1,
-      name: 'Updated User',
-      email: 'updated@example.com',
-      role: 'user',
-    });
-
-    const updatedUser = await controller.update('1', { name: 'Updated User' });
-
-    expect(updatedUser).toEqual({
-      id: 1,
-      name: 'Updated User',
-      email: 'updated@example.com',
-      role: 'user',
-    });
+    const result = await controller.update(1, { name: 'Updated User' });
+    expect(result.message).toBe('Пользователь успешно обновлён.');
   });
 
-  it('should remove a user by ID', async () => {
-    jest.spyOn(service, 'remove').mockResolvedValue({
-      id: 1,
-      name: 'Deleted User',
-      email: 'deleted@example.com',
-      role: 'user',
-    });
-
-    const removedUser = await controller.remove('1');
-
-    expect(removedUser).toEqual({
-      id: 1,
-      name: 'Deleted User',
-      email: 'deleted@example.com',
-      role: 'user',
-    });
+  it('should delete a user', async () => {
+    const result = await controller.remove(1);
+    expect(result.message).toBe('Пользователь успешно удалён.');
   });
 });
