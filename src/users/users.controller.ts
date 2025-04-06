@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ForbiddenException } from '@nestjs/common';
+import {Controller, Get, Post, Put, Delete, Param, Body, UseGuards, ForbiddenException, Req} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -18,10 +18,17 @@ export class UsersController {
 
   @Roles('admin', 'user')
   @Get(':id')
-  async findOne(@Param('id') id: string, @Body() body: { userId: number }) {
-    const user = await this.usersService.findOne(parseInt(id));
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      throw new ForbiddenException(`ID ${id} не является валидным числом.`);
+    }
 
-    if (user.id !== body.userId && user.role !== 'admin') {
+    const user = await this.usersService.findOne(numericId);
+
+    const currentUser = req.user;
+
+    if (user.id !== currentUser.userId && currentUser.role !== 'admin') {
       throw new ForbiddenException(UserMessages.FORBIDDEN_ACCESS);
     }
 

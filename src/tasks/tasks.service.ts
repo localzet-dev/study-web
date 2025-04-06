@@ -78,7 +78,7 @@ export class TasksService {
         description: data.description,
         priority: data.priority,
         status: data.status,
-        completed: data.status ? new Date() : null, // если статус true, добавляем дату завершения
+        completed: data.status ? new Date() : undefined, // если статус true, добавляем дату завершения
       },
     });
     return updatedTask;

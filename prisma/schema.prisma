@@ -26,14 +26,14 @@ model users {
 }
 
 model tasks {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   id_user     Int
   title       String
-  description String
-  priority    Int
+  description String?
+  priority    Int       @default(1)
   status      Boolean
   created     DateTime
-  completed   DateTime
+  completed   DateTime?
   pomodoros   Int
 
   user  users   @relation(fields: [id_user], references: [id])
@@ -43,7 +43,7 @@ model tasks {
 model timer {
   id                  Int @id @default(autoincrement())
   id_user             Int
-  id_task             Int
+  id_task             Int @unique
   work_interval       Int @default(25)
   break_interval      Int @default(5)
   pomodoros_completed Int
