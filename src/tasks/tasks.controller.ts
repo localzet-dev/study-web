@@ -1,4 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Param,
+  Body,
+  Query,
+  UseGuards,
+  ForbiddenException,
+  Req
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
@@ -30,8 +42,8 @@ export class TasksController {
 
   @Roles('admin', 'user')
   @Post()
-  async create(@Body() createTaskDto: CreateTaskDto) {
-    const task = await this.tasksService.create(createTaskDto);
+  async create(@Body() createTaskDto: CreateTaskDto, @Req() request) {
+    const task = await this.tasksService.create(createTaskDto, request.user);
     return { message: TaskMessages.CREATED_SUCCESS, task };
   }
 

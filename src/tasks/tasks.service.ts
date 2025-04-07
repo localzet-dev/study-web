@@ -50,10 +50,10 @@ export class TasksService {
     return task;
   }
 
-  async create(data: CreateTaskDto) {
+  async create(data: CreateTaskDto, user) {
     const task = await this.prisma.tasks.create({
       data: {
-        id_user: data.userId,
+        id_user: data.userId ?? user.id,
         title: data.title,
         description: data.description,
         priority: data.priority,
